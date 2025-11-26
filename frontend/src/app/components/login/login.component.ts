@@ -24,20 +24,22 @@ export class LoginComponent {
   // TODO for candidates: Add form validation
   // TODO for candidates: Handle errors and show user feedback
   onSubmit() {
-    try {
-      // FIXME: This will fail because login is not implemented in AuthService
-      this.authService.login({ email: this.email, password: this.password }).subscribe({
-        next: (response) => {
-          // TODO: Store token and navigate to tasks
-          this.router.navigate(['/tasks']);
-        },
-        error: (error) => {
-          this.errorMessage = 'Login failed. Please check your credentials.';
-          console.error('Login error:', error);
-        },
-      });
-    } catch (error) {
-      this.errorMessage = 'Login functionality not yet implemented';
+    if (!this.email || !this.password) {
+      this.errorMessage = 'Email and password are required';
+      return;
     }
+    // FIXME: This will fail because login is not implemented in AuthService
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: (response) => {
+        // TODO: Store token and navigate to tasks
+        // My comment: The token storage is now handled in AuthService
+        this.errorMessage = '';
+        this.router.navigate(['/tasks']);
+      },
+      error: (error) => {
+        this.errorMessage = 'Login failed. Please check your credentials.';
+        console.error('Login error:', error);
+      },
+    });
   }
 }
