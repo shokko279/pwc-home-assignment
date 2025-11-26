@@ -7,13 +7,11 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule,
-    // TODO for candidates: Configure JWT module with proper secret and expiration
-    // Currently this is incomplete and needs to be configured
+    UsersModule,
     JwtModule.register({
-      secret: 'CHANGE_ME_IN_PRODUCTION', // TODO: Move to environment variable
-      signOptions: { expiresIn: '24h' },
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIRATION },
     }),
   ],
   controllers: [AuthController],

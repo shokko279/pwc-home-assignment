@@ -1,11 +1,20 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
@@ -29,14 +38,28 @@ export class AuthService {
   // 2. Generate and return a JWT token
   // 3. Handle errors appropriately (user not found, wrong password)
   async login(loginDto: LoginDto) {
-    throw new Error(
-      'Login endpoint not implemented yet. TODO: Implement JWT authentication',
-    );
+    const user = await this.validateUser(loginDto.email, loginDto.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    const payload = { sub: user.id, email: user.email };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user,
+    };
   }
 
   // TODO for candidates: Implement token validation
   // This method should validate JWT tokens and return user information
   async validateUser(email: string, password: string): Promise<any> {
-    throw new Error('User validation not implemented yet');
+    const user = await this.usersService.findByEmail(email);
+    if (!user) return null;
+
+    const passwordMatches = await bcrypt.compare(password, user.password);
+    if (!passwordMatches) return null;
+
+    const { password: _, ...rest } = user.toObject();
+    return rest;
   }
 }
