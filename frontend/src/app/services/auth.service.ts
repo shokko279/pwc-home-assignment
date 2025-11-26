@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 interface RegisterData {
   email: string;
@@ -35,28 +35,35 @@ export class AuthService {
   // TODO for candidates: Implement login method
   // Should call the backend login endpoint and store the JWT token
   login(data: LoginData): Observable<AuthResponse> {
-    // FIXME: This is incomplete - needs to call backend and handle token storage
-    throw new Error('Login method not implemented yet');
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
+      tap((response) => {
+        if (response.token) {
+          localStorage.setItem('jwt_token', response.token);
+        } else {
+          throw new Error('No token returned from backend');
+        }
+      }),
+    );
   }
 
   // TODO for candidates: Implement logout method
   // Should clear the stored JWT token
   logout(): void {
     // FIXME: Implement token removal from storage
-    throw new Error('Logout method not implemented yet');
+    localStorage.removeItem('jwt_token');
   }
 
   // TODO for candidates: Implement token storage and retrieval
   // Store JWT token in localStorage or sessionStorage
   getToken(): string | null {
     // FIXME: Implement token retrieval
-    return null;
+    return localStorage.getItem('jwt_token');
   }
 
   // TODO for candidates: Implement authentication check
   // Return true if user is authenticated (has valid token)
   isAuthenticated(): boolean {
     // FIXME: Implement authentication check
-    return false;
+    return !!this.getToken();
   }
 }
