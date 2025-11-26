@@ -28,6 +28,23 @@ export class TaskListComponent implements OnInit {
     this.loadTasks();
   }
 
+  createTask() {
+    const newTask: Partial<Task> = {
+      title: 'New Task',
+      description: 'This is a new mock task.',
+      status: TaskStatus.TODO,
+      priority: TaskPriority.MEDIUM,
+    };
+
+    this.taskService.createTask(newTask).subscribe({
+      next: () => this.loadTasks(),
+      error: (error) => {
+        this.errorMessage = 'Failed to create task';
+        console.error('Error creating task:', error);
+      },
+    });
+  }
+
   loadTasks() {
     this.taskService.getTasks().subscribe({
       next: (tasks) => {

@@ -38,7 +38,7 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
       tap((response) => {
         if (response.token) {
-          localStorage.setItem('jwt_token', response.token);
+          this.storeToken(response.token);
         } else {
           throw new Error('No token returned from backend');
         }
@@ -53,8 +53,12 @@ export class AuthService {
     localStorage.removeItem('jwt_token');
   }
 
+  
   // TODO for candidates: Implement token storage and retrieval
   // Store JWT token in localStorage or sessionStorage
+  storeToken(token: string): void {
+    localStorage.setItem('jwt_token', token);
+  }
   getToken(): string | null {
     // FIXME: Implement token retrieval
     return localStorage.getItem('jwt_token');
