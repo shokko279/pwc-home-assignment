@@ -2,7 +2,7 @@
 
 **Candidate Name:** [Your Name]  
 **Date:** [Submission Date]  
-**Estimated Time Spent:** [X hours] (Target: 1-2 hours for mandatory + optional bonus time)
+**Estimated Time Spent:** [2 - 2.5 hours (mandatory features)] (Target: 1-2 hours for mandatory + optional bonus time)
 
 **Tech Stack Used:**
 - Frontend: Angular 21.0.0
