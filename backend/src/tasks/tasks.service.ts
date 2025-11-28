@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task, TaskDocument } from './task.schema';
@@ -51,6 +55,13 @@ export class TasksService {
     if (!task) {
       throw new NotFoundException('Task not found');
     }
+
+    if (task.userId.toString() !== userId.toString()) {
+      throw new ForbiddenException('You cannot modify this task');
+    }
+
+    Object.assign(task, updateTaskDto);
+
     return task;
   }
 
@@ -61,6 +72,10 @@ export class TasksService {
 
     if (!task) {
       throw new NotFoundException('Task not found');
+    }
+
+    if (task.userId.toString() !== userId.toString()) {
+      throw new ForbiddenException('You cannot delete this task');
     }
 
     return task;

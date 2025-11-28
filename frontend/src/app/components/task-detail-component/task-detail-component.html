@@ -1,0 +1,19 @@
+<h2>Edit Task</h2>
+
+<form [formGroup]="taskForm" (ngSubmit)="save()">
+  <div>
+    <label for="title">Title</label>
+    <input id="title" formControlName="title" />
+    <div *ngIf="taskForm.controls['title'].invalid && taskForm.controls['title'].touched">
+      Title is required.
+    </div>
+  </div>
+
+  <div>
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description"></textarea>
+  </div>
+
+  <button type="submit" [disabled]="taskForm.invalid">Save</button>
+  <button type="button" (click)="router.navigate(['/tasks'])">Cancel</button>
+</form>

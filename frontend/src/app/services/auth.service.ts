@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
 
 interface RegisterData {
   email: string;
@@ -20,6 +21,13 @@ interface AuthResponse {
   name?: string;
 }
 
+interface JwtPayload {
+  sub: string;
+  email: string;
+  iat: number;
+  exp: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,8 +40,19 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data);
   }
 
-  // TODO for candidates: Implement login method
-  // Should call the backend login endpoint and store the JWT token
+  getUserId(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const decoded = jwtDecode<JwtPayload>(token);
+      return decoded.sub;
+    } catch (e) {
+      console.error('Failed to decode JWT', e);
+      return null;
+    }
+  }
+
   login(data: LoginData): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).pipe(
       tap((response) => {
@@ -46,22 +65,16 @@ export class AuthService {
     );
   }
 
-  // TODO for candidates: Implement logout method
-  // Should clear the stored JWT token
   logout(): void {
-    // FIXME: Implement token removal from storage
-    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('token');
   }
 
-  
-  // TODO for candidates: Implement token storage and retrieval
-  // Store JWT token in localStorage or sessionStorage
   storeToken(token: string): void {
-    localStorage.setItem('jwt_token', token);
+    localStorage.setItem('token', token);
   }
+
   getToken(): string | null {
-    // FIXME: Implement token retrieval
-    return localStorage.getItem('jwt_token');
+    return localStorage.getItem('token');
   }
 
   // TODO for candidates: Implement authentication check
